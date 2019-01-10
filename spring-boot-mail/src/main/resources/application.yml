@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: spring-boot-mail
+
+  mail:
+    host: smtp.163.com
+    username: yourusername
+    password: yourpassword
+    default-encoding: UTF-8
+
+mail:
+  fromMail:
+    address: sendmailfrom
