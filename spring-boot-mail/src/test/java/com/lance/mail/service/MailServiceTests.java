@@ -8,14 +8,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MailServiceTest {
+public class MailServiceTests {
 
     @Autowired
     private MailService mailService;
 
     @Test
     public void testSimpleMail() throws Exception {
-        mailService.sendSimpleMail("zhaotianicy@163.com", "meeting time", "sorry, you can't register the website.");
+        mailService.sendSimpleMail("zhaotianicy@163.com", "mailbox", "sorry, you can't register the website.");
     }
 
 }
