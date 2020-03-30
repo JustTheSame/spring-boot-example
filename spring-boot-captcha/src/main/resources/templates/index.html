@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <tr>
+        <td nowrap width="437"></td>
+        <td>
+            <img id="img" src="/image" onclick="javascript:changeImg()"/>
+            <a href='#' onclick="javascript:changeImg()" style="color:white;"><label
+                    style="color:black;">看不清？</label></a>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap width="437"></td>
+        <td>
+            <input type="text" id="verCode" value=""/>
+            <button id="validImage">验证</button>
+        </td>
+
+    </tr>
+</table>
+
+<!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+</body>
+<!-- 触发JS刷新-->
+<script type="text/javascript">
+    function changeImg() {
+        // var img = document.getElementById("img");
+        $("#img").attr("src", "/image?date=" + new Date().getTime());
+    }
+
+    $("#validImage").click(function () {
+        alert(1);
+        $.post("/valid",
+            {
+                code: $("#verCode").val()
+            },
+            function (data) {
+                console.log(data);
+            });
+    });
+
+
+</script>
+</html>

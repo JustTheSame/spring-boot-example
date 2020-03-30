@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lance.file.dao.TFileDao">
+
+    <resultMap type="com.lance.file.entity.TFile" id="TFileMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="profilePhoto" column="profile_photo" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TFileMap">
+        select
+          id, profile_photo, create_time, update_time
+        from demo.t_file
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TFileMap">
+        select
+          id, profile_photo, create_time, update_time
+        from demo.t_file
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="TFileMap">
+        select
+          id, profile_photo, create_time, update_time
+        from demo.t_file
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="profilePhoto != null and profilePhoto != ''">
+                and profile_photo = #{profilePhoto}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into demo.t_file(profile_photo, create_time, update_time)
+        values (#{profilePhoto}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update demo.t_file
+        <set>
+            <if test="profilePhoto != null and profilePhoto != ''">
+                profile_photo = #{profilePhoto},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from demo.t_file where id = #{id}
+    </delete>
+
+</mapper>

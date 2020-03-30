@@ -1,0 +1,964 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>H5简历</title>
+    <script src="http://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
+    <style>
+        /* all */
+        * {
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-size: 1.5625vw;
+            font-family: "Microsoft Yahei"
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background-color: #f1f1f1;
+        }
+
+        .pag {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden
+        }
+
+        .pag > .bg {
+            height: 100%;
+        }
+
+        .pag > .bg > div {
+            position: absolute;
+        }
+
+        .pag > .container {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bbin_music {
+            position: fixed;
+            top: 5vh;
+            right: 4vw;
+            z-index: 5;
+            width: 12vw;
+            height: 12vw;
+            border: 5px solid #f11;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        .bbin_next {
+            position: fixed;
+            bottom: 2vh;
+            left: 48vw;
+            width: 5vw;
+            height: 5vw;
+            z-index: 5;
+            transform: rotate(45deg);
+            border-top: 1vw solid #fff;
+            border-left: 1vw solid #fff;
+            border-right: 1vw solid transparent;
+            border-bottom: 1vw solid transparent;
+            -webkit-animation: next 1s infinite alternate;
+            animation: next 1s infinite alternate;
+        }
+
+        @-webkit-keyframes next {
+            0% {
+                bottom: .5vh;
+            }
+            100% {
+                bottom: 3vh;
+            }
+        }
+
+        @keyframes next {
+            0% {
+                bottom: .5vh;
+            }
+            100% {
+                bottom: 3vh;
+            }
+        }
+
+        /* p1>bg */
+        #p1 {
+            display: block;
+        }
+
+        #p1 > .bg {
+            background: linear-gradient(#6f6d78, #fff);
+        }
+
+        #p1 > .bg > .moon {
+            top: 30vh;
+            left: 30vw;
+            width: 20vw;
+            height: 20vw;
+            border-radius: 50%;
+            background-color: #fefefe;
+        }
+
+        #p1 > .bg > .hill {
+            top: 10vh;
+            width: 120%;
+            padding-top: 120%;
+            transform: rotate(30deg);
+        }
+
+        #p1 > .bg > .hill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            transform: skewX(-30deg);
+        }
+
+        #p1 > .bg > .h1 {
+            top: 50vh;
+            left: -50vw;
+        }
+
+        #p1 > .bg > .h2 {
+            top: 50vh;
+            left: -20vw;
+        }
+
+        #p1 > .bg > .h3 {
+            top: 50vh;
+            left: 40vw;
+        }
+
+        #p1 > .bg > .h4 {
+            top: 80vh;
+            left: 15vw;
+        }
+
+        #p1 > .bg > .h5 {
+            top: 80vh;
+            left: -70vw;
+        }
+
+        #p1 > .bg > .h1::before {
+            background-color: #95a2aa;
+        }
+
+        #p1 > .bg > .h2::before {
+            background-color: #73788c;
+        }
+
+        #p1 > .bg > .h3::before {
+            background-color: #505269;
+        }
+
+        #p1 > .bg > .h4::before {
+            background-color: #3b4358;
+        }
+
+        #p1 > .bg > .h5::before {
+            background-color: #352f3d;
+        }
+
+        /* p1>container */
+        #p1 > .container > div {
+            position: relative;
+            top: 5vh;
+            left: 10vw;
+            font-size: 4.4rem;
+            color: #fefefe;
+        }
+
+        #p1 > .container > div > span {
+            font-size: 2.4rem;
+        }
+
+        /* p2>bg */
+        #p2 > .bg {
+            background-color: #224251;
+        }
+
+        #p2 > .bg > .moon {
+            top: 5vh;
+            left: 10vw;
+            width: 30%;
+            padding-top: 30%;
+            border-radius: 50%;
+            background-color: #fefccb;
+        }
+
+        #p2 > .bg > .h1 {
+            top: 80%;
+            left: -20%;
+            width: 100%;
+            padding-top: 100%;
+            transform: rotate(45deg);
+            overflow: hidden;
+            background-color: #ddebf6;
+        }
+
+        #p2 > .bg > .h1::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: -30%;
+            width: 100%;
+            height: 20%;
+            transform: rotate(-45deg);
+            background-color: #95a7cb;
+        }
+
+        #p2 > .bg > .h2 {
+            width: 120%;
+            padding-top: 120%;
+            top: 90%;
+            left: 10%;
+            transform: rotate(70deg);
+            background-color: #797a7e;
+        }
+
+        /* p2>container */
+        #p2 > .container > div {
+            float: right;
+            margin-top: 25vh;
+            margin-right: 5vw;
+            height: 70vh;
+            color: #fff;
+            font-size: 1.8rem;
+        }
+
+        #p2 > .container > div.jbxx1 {
+            margin-right: 7vw;
+        }
+
+        /* xmjl>bg */
+        .xmjl > .bg {
+            background-color: #14a6b5;
+        }
+
+        .xmjl > .bg > .moon {
+            top: 15%;
+            left: -8%;
+            width: 30%;
+            padding-top: 30%;
+            border-radius: 50%;
+            background-color: #fefefe;
+        }
+
+        .xmjl > .bg > .line {
+            top: 0%;
+            left: 25%;
+            width: .5%;
+            height: 70%;
+            background-color: #fefefe;
+        }
+
+        .xmjl > .bg > .point {
+            top: 69%;
+            left: 23.8%;
+            width: 3%;
+            padding-top: 3%;
+            border-radius: 50%;
+            background-color: #fefefe;
+        }
+
+        .xmjl > .bg > .bottom {
+            top: 80%;
+            width: 120%;
+            padding-top: 100%;
+            transform: rotate(-15deg);
+            background-color: #224251;
+        }
+
+        .xmjl > .bg > .bottom-line {
+            top: 82%;
+            left: -10%;
+            width: 120%;
+            padding-top: 2%;
+            transform: rotate(-15deg);
+            background-color: #14a6b5;
+        }
+
+        /* xmjl>container */
+        .xmjl > .container > div {
+            position: absolute;
+            color: #fff;
+        }
+
+        .xmjl > .container > div.xm {
+            top: 15%;
+            left: 28%;
+        }
+
+        .xmjl > .container > div.xm > div {
+            position: relative;
+            margin: 0 0 5vh 0;
+            font-size: 1.8rem;
+        }
+
+        .xmjl > .container > div.title {
+            bottom: 10%;
+            right: 10%;
+            font-size: 3.8rem;
+            color: #14a6b5;
+        }
+
+        /* p5>bg */
+        #p5 > .bg {
+            background-color: #a67567;
+        }
+
+        #p5 > .bg > .center {
+            top: 50%;
+            left: 1%;
+            width: 98%;
+            margin-top: -49%;
+            padding-top: 98%;
+            border-radius: 50%;
+            background-color: #fefefe;
+        }
+
+        #p5 > .bg > .top {
+            width: 0;
+            height: 0;
+            border: 17.5vw solid #61443e;
+            border-right: 17.5vw solid transparent;
+            border-bottom: 17.5vw solid transparent;
+            opacity: .4;
+        }
+
+        #p5 > .bg > .bottom {
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border: 17.5vw solid #61443e;
+            border-top: 17.5vw solid transparent;
+            border-left: 17.5vw solid transparent;
+            opacity: .4;
+        }
+
+        #p5 > .container > div {
+            color: #a67567;
+            text-align: center;
+            font-size: 2.8rem;
+        }
+
+        #p5 > .container > div:first-of-type {
+            font-size: 3.8rem;
+            margin-top: 40vh;
+        }
+
+        /* p1 动画 */
+        .pag {
+            -webkit-animation: p1_bg 1s;
+            animation: p1_bg 1s;
+        }
+
+        @-webkit-keyframes p1_bg {
+            0% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+
+        @keyframes p1_bg {
+            0% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+
+        #p1 > .bg > .h1 {
+            -webkit-animation: p1_bg_h1 1.5s;
+            animation: p1_bg_h1 1.5s;
+        }
+
+        #p1 > .bg > .h2 {
+            -webkit-animation: p1_bg_h1 1.7s;
+            animation: p1_bg_h1 1.7s;
+        }
+
+        #p1 > .bg > .h3 {
+            -webkit-animation: p1_bg_h1 1.9s;
+            animation: p1_bg_h1 1.9s;
+        }
+
+        @-webkit-keyframes p1_bg_h1 {
+            0% {
+                top: 110vh;
+            }
+            50% {
+                top: 110vh;
+            }
+            100% {
+                top: 50vh;
+            }
+        }
+
+        @keyframes p1_bg_h1 {
+            0% {
+                top: 110vh;
+            }
+            50% {
+                top: 110vh;
+            }
+            100% {
+                top: 50vh;
+            }
+        }
+
+        #p1 > .bg > .h4, #p1 > .bg > .h5 {
+            -webkit-animation: p1_bg_h45 2s;
+            animation: p1_bg_h45 2s;
+        }
+
+        @-webkit-keyframes p1_bg_h45 {
+            0% {
+                top: 110vh;
+            }
+            50% {
+                top: 110vh;
+            }
+            100% {
+                top: 80vh;
+            }
+        }
+
+        @keyframes p1_bg_h45 {
+            0% {
+                top: 110vh;
+            }
+            50% {
+                top: 110vh;
+            }
+            100% {
+                top: 80vh;
+            }
+        }
+
+        #p1 > .bg > .moon {
+            -webkit-animation: p1_bg_moon 3s linear;
+            animation: p1_bg_moon 3s linear;
+        }
+
+        @-webkit-keyframes p1_bg_moon {
+            0% {
+                top: 60vh;
+                opacity: 0
+            }
+            33% {
+                top: 60vh;
+                opacity: 0
+            }
+            100% {
+                top: 30vh;
+                opacity: 1
+            }
+        }
+
+        @keyframes p1_bg_moon {
+            0% {
+                top: 60vh;
+                opacity: 0
+            }
+            33% {
+                top: 60vh;
+                opacity: 0
+            }
+            100% {
+                top: 30vh;
+                opacity: 1
+            }
+        }
+
+        #p1 > .container > div {
+            -webkit-animation: p1_bg_container 2s linear;
+            animation: p1_bg_container 2s linear;
+        }
+
+        @-webkit-keyframes p1_bg_container {
+            0% {
+                opacity: 0
+            }
+            50% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+
+        @keyframes p1_bg_container {
+            0% {
+                opacity: 0
+            }
+            50% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+
+        /* p2 动画 */
+        #p2 > .bg > .h1 {
+            -webkit-animation: p2_bg_h1 2s;
+            animation: p2_bg_h1 2s;
+        }
+
+        @-webkit-keyframes p2_bg_h1 {
+            0% {
+                left: -110%
+            }
+            30% {
+                left: -110%
+            }
+        }
+
+        @keyframes p2_bg_h1 {
+            0% {
+                left: -110%
+            }
+            30% {
+                left: -110%
+            }
+        }
+
+        #p2 > .bg > .h2 {
+            -webkit-animation: p2_bg_h2 2s;
+            animation: p2_bg_h2 2s;
+        }
+
+        @-webkit-keyframes p2_bg_h2 {
+            0% {
+                left: 110%
+            }
+            30% {
+                left: 110%
+            }
+        }
+
+        @keyframes p2_bg_h2 {
+            0% {
+                left: 110%
+            }
+            30% {
+                left: 110%
+            }
+        }
+
+        #p2 > .bg > .moon, #p2 > .container {
+            -webkit-animation: p2_bg_moon 5s;
+            animation: p2_bg_moon 5s;
+        }
+
+        @-webkit-keyframes p2_bg_moon {
+            0% {
+                opacity: 0
+            }
+            40% {
+                opacity: 0
+            }
+        }
+
+        @keyframes p2_bg_moon {
+            0% {
+                opacity: 0
+            }
+            40% {
+                opacity: 0
+            }
+        }
+
+        /* p3 动画 */
+        .xmjl > .bg > .line {
+            -webkit-animation: p3_bg_line 2s;
+            animation: p3_bg_line 2s;
+        }
+
+        @-webkit-keyframes p3_bg_line {
+            0% {
+                top: -70vh
+            }
+            40% {
+                opacity: -70vh
+            }
+        }
+
+        @keyframes p3_bg_line {
+            0% {
+                top: -70vh
+            }
+            40% {
+                opacity: -70vh
+            }
+        }
+
+        .xmjl > .bg > .moon {
+            -webkit-animation: p3_bg_moon 2.5s;
+            animation: p3_bg_moon 2.5s;
+        }
+
+        @-webkit-keyframes p3_bg_moon {
+            0% {
+                left: -30%;
+            }
+        }
+
+        @keyframes p3_bg_moon {
+            0% {
+                left: -30%;
+            }
+        }
+
+        .xmjl > .bg > .point {
+            -webkit-animation: p3_bg_point 2.5s;
+            animation: p3_bg_point 2.5s;
+        }
+
+        @-webkit-keyframes p3_bg_point {
+            0% {
+                width: 0;
+                padding-top: 0
+            }
+            80% {
+                width: 0;
+                padding-top: 0
+            }
+        }
+
+        @keyframes p3_bg_point {
+            0% {
+                width: 0;
+                padding-top: 0
+            }
+            80% {
+                width: 0;
+                padding-top: 0
+            }
+        }
+
+        .xmjl > .bg > .bottom {
+            -webkit-animation: p3_bg_bottom 1.5s;
+            animation: p3_bg_bottom 1.5s;
+        }
+
+        @-webkit-keyframes p3_bg_bottom {
+            0% {
+                top: 110%
+            }
+            30% {
+                top: 110%
+            }
+        }
+
+        @keyframes p3_bg_bottom {
+            0% {
+                top: 110%
+            }
+            30% {
+                top: 110%
+            }
+        }
+
+        .xmjl > .container > div.xm {
+            -webkit-animation: p3_con_xm 2.5s;
+            animation: p3_con_xm 2.5s;
+        }
+
+        @-webkit-keyframes p3_con_xm {
+            0% {
+                top: 40%;
+                opacity: 0
+            }
+            40% {
+                top: 40%;
+                opacity: 0
+            }
+        }
+
+        @keyframes p3_con_xm {
+            0% {
+                top: 40%;
+                opacity: 0
+            }
+            40% {
+                top: 40%;
+                opacity: 0
+            }
+        }
+
+        /* p5动画 */
+        #p5 > .bg > .center {
+            -webkit-animation: p5_bg_cn 1.7s;
+            animation: p5_bg_cn 1.7s;
+        }
+
+        @-webkit-keyframes p5_bg_cn {
+            0% {
+                transform: scale(0)
+            }
+            40% {
+                transform: scale(0)
+            }
+        }
+
+        @keyframes p5_bg_cn {
+            0% {
+                transform: scale(0)
+            }
+            40% {
+                transform: scale(0)
+            }
+        }
+
+        .bbin_music > div {
+            position: relative;
+            margin: 22% auto;
+            width: 35%;
+            padding-top: 40%;
+            border-top: 6px solid #333;
+            border-right: 2px solid #333;
+            border-left: 2px solid #333;
+            border-radius: 3px;
+            transform: skewY(-15deg)
+        }
+
+        .bbin_music > div::before, .bbin_music > div::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 35%;
+            padding-top: 30%;
+            border-radius: 40%;
+            background-color: #333;
+            top: 80%;
+        }
+
+        .bbin_music > div::before {
+            left: -35%;
+        }
+
+        .bbin_music > div::after {
+            left: 80%;
+        }
+
+        .play {
+            -webkit-animation: r 3s linear infinite;
+            animation: r 3s linear infinite;
+        }
+
+        @-webkit-keyframes r {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes r {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }</style>
+</head>
+<body>
+<div class="pag" id="p1">
+    <div class="bg">
+        <div class="moon"></div>
+        <div class="hill h1"></div>
+        <div class="hill h2"></div>
+        <div class="hill h3"></div>
+        <div class="hill h4"></div>
+        <div class="hill h5"></div>
+    </div>
+    <div class="container">
+        <div>我的简历<br><span>by冯配宾，请在移动端查看效果</span></div>
+    </div>
+</div>
+<div class="pag" id="p2">
+    <div class="bg">
+        <div class="moon"></div>
+        <div class="h1"></div>
+        <div class="h2"></div>
+    </div>
+    <div class="container">
+        <div class="title">基<br>本<br>信<br>息</div>
+        <div class="jbxx2">姓<br>名<br>.<br>冯<br>配<br>宾</div>
+        <div class="jbxx3">电<br>话<br>.<br>1<br>8<br>8<br>1<br>3<br>7<br>5<br>2<br>7<br>2<br>5</div>
+        <div class="jbxx4">邮<br>箱<br>.<br>b<br>e<br>a<br>n<br>_<br>k<br>@<br>q<br>q<br>.<br>c<br>o<br>m</div>
+        <div class="jbxx5">籍<br>贯<br>.<br>广<br>东<br>茂<br>名</div>
+        <div class="jbxx6">学<br>校<br>.<br>华<br>南<br>农<br>业<br>大<br>学</div>
+        <div class="jbxx7">专<br>业<br>.<br>软<br>件<br>工<br>程</div>
+    </div>
+</div>
+<div class="pag xmjl" id="p3">
+    <div class="bg">
+        <div class="moon"></div>
+        <div class="line"></div>
+        <div class="point"></div>
+        <div class="bottom"></div>
+        <div class="bottom-line"></div>
+    </div>
+    <div class="container">
+        <div class="title">实习经历</div>
+        <div class="xm">
+            <div class="xm1">2016-12至2017-2广东南方数码<br>在实习期间，参与国土规划院汇总项目，负责其中的汇总规则配置的开发。参与项目结构和SSH框架的搭建，注重MVC分层，参与Oracle数据字典表，汇总规则表的设计。
+            </div>
+            <div class="xm2">2016-6至2017-9四川华迪<br>随学校安排参加Java
+                Web实训，参与设计成都中职教育信息平台，涉及权限、公告、填报等模块的开发，熟悉使用Java以及SSM框架，以及MySQL数据库和SQL语言。
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pag xmjl" id="p4">
+    <div class="bg">
+        <div class="moon"></div>
+        <div class="line"></div>
+        <div class="point"></div>
+        <div class="bottom"></div>
+        <div class="bottom-line"></div>
+    </div>
+    <div class="container">
+        <div class="title">项目经历</div>
+        <div class="xm">
+            <div class="xm1">2017-4至2017-4移动端Web个人简历<br>即这个简历，为了提升竞争力，和了解H5页面的开发，自主设计和编码完成H5的简历</div>
+            <div class="xm2">2017-2至2017-4易居二手房（毕设）<br>Java Web的个人项目，提高了前端的熟练度，掌握响应式布局，css3动画，组件化开发.<br>易居二手房系统基于Web
+                Socket和SSH（SpringMVC + Spring + Hibernate）实现公司形象后台，系统管理，经纪人模块
+            </div>
+            <div class="xm3">2016-2至2016-4推箱子游戏及算法<br>Java个人项目，主要研究求出最短步数的算法实现和优化，由点对点的图的广度遍历，推广到视图到视图的遍历</div>
+            <div class="xm4">2015-10至2015-12通讯录PC版<br>Java桌面程序，主要研究一个项目开发的整体流程和模糊查询的实现，从系统分析到测试，熟悉UML建模，MVC的代码分层等等</div>
+        </div>
+    </div>
+</div>
+<div class="pag" id="p5">
+    <div class="bg">
+        <div class="center"></div>
+        <div class="top"></div>
+        <div class="bottom"></div>
+    </div>
+    <div class="container">
+        <div>感谢观看</div>
+        <div>如果对我有兴趣，请赐我一次面试机会<br>邮箱：bean_k@qq.com<br>电话：18813752725</div>
+    </div>
+</div>
+<div class="bbin_music" id="bbin_music"></div>
+<div class="bbin_next"></div>
+
+<script>
+    window.onload = function () {
+        new bbin_music(document.getElementById('bbin_music'), 'Hoaprox.mp3');
+        var pag = document.getElementsByClassName('pag');
+        var pagC = pag.length;
+        for (var i = 0; i < pagC; i++) {
+            var p = pag[i];
+            p.addEventListener('touchstart', touchstart, false);
+            p.addEventListener('touchmove', touchmove, false);
+            p.addEventListener('touchend', touchend, false);
+        }
+        var x, y, dx, dy, n;
+
+        function touchstart(event) {
+            n = this.id.substring(1);
+            y = event.touches[0].clientY;
+            dy = 0;
+        }
+
+        function touchmove(event) {
+            dy = event.touches[0].clientY - y;
+            if (n == 1 && dy > 0) {
+                return;
+            } else if (n == pagC && dy < 0) {
+                return
+            }
+            this.style.top = dy + 'px';
+        }
+
+        function touchend(event) {
+            if (dy < -95) {
+                if (n == pagC) {
+                    return;
+                }
+                this.style.transition = 'top .5s';
+                this.style.top = '-100%'
+                setTimeout(next, 500)
+            } else if (dy > 95) {
+                if (n == 1) {
+                    return;
+                }
+                this.style.transition = 'top .5s';
+                this.style.top = '100%'
+                setTimeout(last, 500)
+            } else {
+                this.style.top = '0%'
+            }
+        }
+
+        function last() {
+            var p = document.getElementById('p' + n);
+            p.style.display = "none"
+            p.style.top = '0%';
+            p.style.transition = 'top 0s';
+            var lp = document.getElementById('p' + --n);
+            lp.style.display = "block"
+        }
+
+        function next() {
+            var p = document.getElementById('p' + n);
+            p.style.display = "none"
+            p.style.top = '0%';
+            p.style.transition = 'top 0s';
+            var np = document.getElementById('p' + ++n);
+            np.style.display = "block"
+        }
+    }
+
+    function bbin_music($dom, $src) {
+        this.dom = $dom;
+        this.music_src = $src;
+        this.init();
+        this.render();
+        this.bind();
+    }
+
+    bbin_music.prototype.init = function () {
+    }
+    bbin_music.prototype.render = function () {
+        this.dom.setAttribute('class', 'bbin_music play');
+        this.dom.innerHTML = '<div><audio id="bbin_audio" autoplay="true"><source src="' + this.music_src + '" type="audio/mpeg"></audio></div>'
+    }
+    bbin_music.prototype.bind = function () {
+        var dom = this.dom;
+        var audio = document.getElementById('bbin_audio');
+        this.dom.addEventListener('touchstart', function () {
+            if (audio.paused) {
+                audio.play();
+                dom.setAttribute('class', 'bbin_music play');
+            } else {
+                audio.pause();
+                dom.setAttribute('class', 'bbin_music');
+            }
+        }, false);
+    }
+</script>
+
+</body>
+</html>
+

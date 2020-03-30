@@ -1,0 +1,11 @@
+wechat:
+  mpAppId:
+  mpAppSecret:
+
+wx:
+  mp:
+    configs:
+      - appId:
+        secret:
+        token:
+        aesKey:

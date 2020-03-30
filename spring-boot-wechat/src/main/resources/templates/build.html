@@ -1,0 +1,706 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>3D城市</title>
+
+    <style>
+        html {
+            overflow: hidden;
+            touch-action: none;
+            content-zooming: none;
+        }
+
+        body {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        #canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            cursor: crosshair;
+        }</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<!-- GLSL shaders in the header -->
+
+<script id="shader-vs" type="x-shader/x-vertex">
+
+	attribute vec3 aVertexPosition;
+	attribute vec3 aVertexNormal;
+	uniform mat4 uMVMatrix;
+	uniform mat4 uPMatrix;
+	uniform mat3 uNMatrix;
+	varying vec3 vNormal;
+	varying vec4 vPosition;
+	varying vec3 vPos;
+
+	void main(void) {
+		vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+		gl_Position = uPMatrix * vPosition;
+		vNormal = uNMatrix * aVertexNormal;
+		vPos = aVertexPosition;
+	}
+
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+
+	precision mediump float;
+	varying vec3 vNormal;
+	varying vec4 vPosition;
+	uniform vec3 uAmbientColor;
+	uniform vec3 uPointLightingLocation;
+	uniform vec3 uPointLightingSpecularColor;
+	uniform vec3 uPointLightingDiffuseColor;
+	uniform vec2 uResolution;
+	varying vec3 vPos;
+
+
+
+	void main(void) {
+		vec3 col;
+		if (vPos.y < 0.0) {
+			col = vec3(0.3, 0.2, 0.1);
+		} else {
+			col = vec3(1.0, 1.0, 1.0);
+		}
+		vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
+		vec3 normal = normalize(vNormal);
+		vec3 eyeDirection = normalize(-vPosition.xyz);
+		vec3 reflectionDirection = reflect(-lightDirection, normal);
+		float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 6.0);
+		float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0);
+		col *= uAmbientColor
+		+ uPointLightingSpecularColor * specularLightWeighting
+		+ uPointLightingDiffuseColor * diffuseLightWeighting;
+		vec2 uv = gl_FragCoord.xy / uResolution;
+		float d = length(uv - vec2(0.5,0.5));
+		col *= 2.5 - d * 3.5;
+		gl_FragColor = vec4(col.x, col.y, col.z, 1.0);
+	}
+
+</script>
+
+
+
+<script>
+
+    // WebGL micro-library
+    // Gerard Ferrandez
+    // last modified: 29/Mar/2016
+
+    var webgl = {};
+
+    (function() {
+
+        // webgl matrix 3x3
+
+        function mat3 () {
+
+            var mat = new Float32Array([1,0,0,0,1,0,0,0,1]);
+
+            mat.identity = function() {
+                this[0] = 1;
+                this[1] = 0;
+                this[2] = 0;
+                this[3] = 0;
+                this[4] = 1;
+                this[5] = 0;
+                this[6] = 0;
+                this[7] = 0;
+                this[8] = 1;
+                return this;
+            }
+
+            mat.normalFromMat4 = function (a) {
+                var
+                    a00 = a[0],  a01 = a[1],  a02 = a[2],  a03 = a[3],
+                    a10 = a[4],  a11 = a[5],  a12 = a[6],  a13 = a[7],
+                    a20 = a[8],  a21 = a[9],  a22 = a[10], a23 = a[11],
+                    a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15],
+                    b00 = a00 * a11 - a01 * a10,
+                    b01 = a00 * a12 - a02 * a10,
+                    b02 = a00 * a13 - a03 * a10,
+                    b03 = a01 * a12 - a02 * a11,
+                    b04 = a01 * a13 - a03 * a11,
+                    b05 = a02 * a13 - a03 * a12,
+                    b06 = a20 * a31 - a21 * a30,
+                    b07 = a20 * a32 - a22 * a30,
+                    b08 = a20 * a33 - a23 * a30,
+                    b09 = a21 * a32 - a22 * a31,
+                    b10 = a21 * a33 - a23 * a31,
+                    b11 = a22 * a33 - a23 * a32,
+                    det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+                if (!det) return null;
+                det = 1.0 / det;
+                this[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+                this[1] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+                this[2] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+                this[3] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+                this[4] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+                this[5] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+                this[6] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+                this[7] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+                this[8] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+                return this;
+            }
+            return mat;
+        }
+
+        // webgl matrix 4x4
+
+        function mat4 () {
+
+            var mat = new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+
+            mat.identity = function() {
+                this[0] = 1;
+                this[1] = 0;
+                this[2] = 0;
+                this[3] = 0;
+                this[4] = 0;
+                this[5] = 1;
+                this[6] = 0;
+                this[7] = 0;
+                this[8] = 0;
+                this[9] = 0;
+                this[10] = 1;
+                this[11] = 0;
+                this[12] = 0;
+                this[13] = 0;
+                this[14] = 0;
+                this[15] = 1;
+                return this;
+            };
+
+            mat.translate = function(v) {
+                var d = v[0],
+                    e = v[1],
+                    b = v[2];
+                this[12] = this[0] * d + this[4] * e + this[8] * b + this[12];
+                this[13] = this[1] * d + this[5] * e + this[9] * b + this[13];
+                this[14] = this[2] * d + this[6] * e + this[10] * b + this[14];
+                this[15] = this[3] * d + this[7] * e + this[11] * b + this[15];
+                return this;
+            };
+
+            mat.fromTranslation = function(v) {
+                this[0] = 1;
+                this[1] = 0;
+                this[2] = 0;
+                this[3] = 0;
+                this[4] = 0;
+                this[5] = 1;
+                this[6] = 0;
+                this[7] = 0;
+                this[8] = 0;
+                this[9] = 0;
+                this[10] = 1;
+                this[11] = 0;
+                this[12] = v[0];
+                this[13] = v[1];
+                this[14] = v[2];
+                this[15] = 1;
+                return this;
+            };
+
+            mat.rotateX = function (angle) {
+                var s = Math.sin(angle),
+                    c = Math.cos(angle),
+                    a10 = this[4],
+                    a11 = this[5],
+                    a12 = this[6],
+                    a13 = this[7],
+                    a20 = this[8],
+                    a21 = this[9],
+                    a22 = this[10],
+                    a23 = this[11];
+                this[4] = a10 * c + a20 * s;
+                this[5] = a11 * c + a21 * s;
+                this[6] = a12 * c + a22 * s;
+                this[7] = a13 * c + a23 * s;
+                this[8] = a20 * c - a10 * s;
+                this[9] = a21 * c - a11 * s;
+                this[10] = a22 * c - a12 * s;
+                this[11] = a23 * c - a13 * s;
+                return this;
+            };
+
+            mat.rotateY = function (angle) {
+                var s = Math.sin(angle),
+                    c = Math.cos(angle),
+                    a00 = this[0],
+                    a01 = this[1],
+                    a02 = this[2],
+                    a03 = this[3],
+                    a20 = this[8],
+                    a21 = this[9],
+                    a22 = this[10],
+                    a23 = this[11];
+                this[0] = a00 * c - a20 * s;
+                this[1] = a01 * c - a21 * s;
+                this[2] = a02 * c - a22 * s;
+                this[3] = a03 * c - a23 * s;
+                this[8] = a00 * s + a20 * c;
+                this[9] = a01 * s + a21 * c;
+                this[10] = a02 * s + a22 * c;
+                this[11] = a03 * s + a23 * c;
+                return this;
+            };
+
+            mat.rotateZ = function (angle) {
+                var s = Math.sin(angle),
+                    c = Math.cos(angle),
+                    a00 = this[0],
+                    a01 = this[1],
+                    a02 = this[2],
+                    a03 = this[3],
+                    a10 = this[4],
+                    a11 = this[5],
+                    a12 = this[6],
+                    a13 = this[7];
+                this[0] = a00 * c + a10 * s;
+                this[1] = a01 * c + a11 * s;
+                this[2] = a02 * c + a12 * s;
+                this[3] = a03 * c + a13 * s;
+                this[4] = a10 * c - a00 * s;
+                this[5] = a11 * c - a01 * s;
+                this[6] = a12 * c - a02 * s;
+                this[7] = a13 * c - a03 * s;
+                return this;
+            };
+
+            mat.multiply = function (a, b) {
+                var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
+                    a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
+                    a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
+                    a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+                var b0  = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+                this[0] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+                this[1] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+                this[2] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+                this[3] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+                b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7];
+                this[4] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+                this[5] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+                this[6] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+                this[7] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+                b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11];
+                this[8] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+                this[9] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+                this[10] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+                this[11] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+                b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15];
+                this[12] = b0*a00 + b1*a10 + b2*a20 + b3*a30;
+                this[13] = b0*a01 + b1*a11 + b2*a21 + b3*a31;
+                this[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
+                this[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
+                return this;
+            };
+
+            mat.frustum = function(a, b, c, d, e, g) {
+                var h = b - a,
+                    i = d - c,
+                    j = g - e;
+                this[0] = e * 2 / h;
+                this[1] = 0;
+                this[2] = 0;
+                this[3] = 0;
+                this[4] = 0;
+                this[5] = e * 2 / i;
+                this[6] = 0;
+                this[7] = 0;
+                this[8] = (b + a) / h;
+                this[9] = (d + c) / i;
+                this[10] = -(g + e) / j;
+                this[11] = -1;
+                this[12] = 0;
+                this[13] = 0;
+                this[14] = -(g * e * 2) / j;
+                this[15] = 0;
+                return this;
+            };
+
+            mat.perspective = function(a, b, c, d) {
+                a = c * Math.tan(a * Math.PI / 360);
+                b = a * b;
+                this.frustum(-b, b, -a, a, c, d);
+                return this;
+            };
+            return mat;
+        }
+
+        // set uniforms
+
+        function setUniforms (gl, program) {
+
+            var uniformSetters = {
+                    0x8B50: function(v1,v2)			{gl.uniform2f(this.index,v1,v2);},
+                    0x8B51: function(v1,v2,v3)		{gl.uniform3f(this.index,v1,v2,v3);},
+                    0x8B52: function(v1,v2,v3,v4)	{gl.uniform4f(this.index,v1,v2,v3,v4);},
+                    0x8B53: function(v1,v2)			{gl.uniform2i(this.index,v1,v2);},
+                    0x8B54: function(v1,v2,v3)		{gl.uniform3i(this.index,v1,v2,v3);},
+                    0x8B55: function(v1,v2,v3,v4)	{gl.uniform4i(this.index,v1,v2,v3,v4);},
+                    0x8B56: function(v)				{gl.uniform1i(this.index,v);},
+                    0x8B5A: function(v)				{gl.uniformMatrix2fv(this.index,false,v);},
+                    0x8B5B: function(v)				{gl.uniformMatrix3fv(this.index,false,v);},
+                    0x8B5C: function(v)				{gl.uniformMatrix4fv(this.index,false,v);},
+                    0x8B5E: function(v)				{gl.uniform1i(this.index,v);},
+                    0x1404: function(v)				{gl.uniform1i(this.index,v);},
+                    0x1406: function(v)				{gl.uniform1f(this.index,v);}
+                },
+
+                num = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS),
+                uniforms = {};
+
+            for (var i = 0; i < num; i++) {
+                var u = gl.getActiveUniform(program, i);
+                uniforms[u.name] = {
+                    index: gl.getUniformLocation(program, u.name),
+                    set: uniformSetters[u.type],
+                    get: function () {
+                        return gl.getUniform(program, this.index);
+                    }
+                };
+            }
+
+            return uniforms;
+        }
+
+        // set attributes
+
+        function setAttributes (gl, program) {
+
+            var num = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES), attributes = {};
+
+            for (var i = 0; i < num; i++) {
+
+                var a = gl.getActiveAttrib(program, i)
+                var index = gl.getAttribLocation(program, a.name);
+                gl.enableVertexAttribArray(index);
+
+                attributes[a.name] = {
+                    buffer: gl.createBuffer(),
+                    index: index,
+                    gl: gl,
+                    numElements: 0,
+
+                    load: function (data, size, normalize) {
+                        var gl = this.gl;
+                        this.data = data instanceof Array ? new Float32Array(data) : data;
+                        this.itemSize = size;
+                        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, this.data, gl.STATIC_DRAW);
+                        this.numElements = this.data.length / this.itemSize;
+                        gl.vertexAttribPointer(
+                            this.index,
+                            this.itemSize,
+                            gl.FLOAT,
+                            normalize || false, 0, 0
+                        );
+                    }
+
+                };
+            }
+
+            return attributes;
+        };
+
+        // indexed geometry buffer
+
+        function setIndices (gl) {
+
+            var indices = {
+                buffer: null,
+                gl: gl,
+                numElements: 0,
+                load: function (data) {
+                    this.data = data instanceof Array ? new Uint16Array(data) : data;
+                    if (!this.buffer) this.buffer = this.gl.createBuffer();
+                    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+                    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, this.data, this.gl.STATIC_DRAW);
+                    this.numElements = data.length;
+                }
+            };
+
+            return indices;
+
+        }
+
+        // compile shaders
+
+        function compile (gl, vs, fs) {
+
+            // compile vertex shader
+
+            var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertexShader, document.getElementById(vs).text);
+            gl.compileShader(vertexShader);
+
+            // compile fragment shader
+
+            var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragmentShader, document.getElementById(fs).text);
+            gl.compileShader(fragmentShader);
+
+            // attach shader programs
+
+            var program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error("Unable to compile shaders!");
+            gl.useProgram(program);
+            return program;
+
+        };
+
+        // initialize context
+
+        this.context = function (id, options) {
+
+            // canvas container
+
+            this.canvas = document.getElementById(id);
+            canvas.width = this.width  = this.canvas.offsetWidth;
+            canvas.height = this.height = this.canvas.offsetHeight;
+
+            // webgl context
+
+            var gl = this.canvas.getContext("webgl", options);
+            if (!gl) gl = this.canvas.getContext("experimental-webgl");
+            if (!gl) throw new Error('This browser does not support WebGL');
+            this.gl = gl;
+
+            // compile shaders
+
+            var program     = compile(gl, "shader-vs", "shader-fs");
+
+            // set uniforms and attributes
+
+            this.uniforms   = setUniforms(gl, program);
+            this.attributes = setAttributes(gl, program);
+            this.indices    = setIndices(gl);
+            this.camera     = setCamera();
+
+            return gl;
+        }
+
+        // clear screen
+
+        this.clear = function (r, g, b) {
+            this.gl.viewport(0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight);
+            this.gl.clearColor(r || 0, g || 0, b || 0, 1);
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        }
+
+        // camera
+
+        function setCamera () {
+
+            var camera = {};
+            camera.webgl = webgl;
+            camera.fov = 90;
+            camera.mvMatrix = mat4();
+            camera.currentRotationMatrix = mat4();
+            camera.newRotationMatrix = mat4();
+            camera.pMatrix = mat4();
+            camera.normalMatrix = mat3();
+
+            camera.init = function (fov) {
+                this.fov = fov || 90;
+                var width = this.webgl.width,
+                    height = this.webgl.height;
+                this.pMatrix.perspective(this.fov, width / height, 0.01, 100.0);
+                this.webgl.uniforms.uPMatrix.set(this.pMatrix);
+                if (webgl.uniforms.uResolution) webgl.uniforms.uResolution.set(width, height);
+                return this;
+            };
+
+            return camera;
+        }
+
+    }).apply(webgl);
+
+</script>
+
+<script>
+    ~ function() {
+
+        'use strict';
+
+        function run() {
+
+            requestAnimationFrame(run);
+            webgl.clear(0, 0.05, 0.1);
+
+            if (pointer.isDown) {
+                cx += (pointer.x - pointer.xb) / 2000;
+                cy += (pointer.y - pointer.yb) / 2000;
+                cz = 0.015;
+            }
+
+            cx *= 0.98;
+            cy *= 0.98;
+            cz *= 0.98;
+
+            camera.move(cx, cy, cz+0.01);
+            gl.drawArrays(gl.TRIANGLES, 0, 30 * nCubes);
+
+            pointer.xb = pointer.x;
+            pointer.yb = pointer.y;
+
+        }
+
+        // init
+
+        var size = 64,
+            vertices = new Float32Array(90 + 90 * size * size),
+            normals = new Float32Array(90 + 90 * size * size),
+            nCubes = 0, cx = 0, cy = 0, cz = 0;
+
+        // webgl
+        var gl = webgl.context('canvas');
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
+
+        // create cubes
+
+        function createCube (x, y, z, l, h, w) {
+
+            l /= 2;
+            w /= 2;
+            h /= 2;
+
+            // vertices
+
+            vertices.set([
+                x-l,y-h,z+w,x+l,y-h,z+w,x+l,y+h,z+w,x-l,y-h,z+w,x+l,y+h,z+w,x-l,y+h,z+w,
+                x-l,y-h,z-w,x-l,y+h,z-w,x+l,y+h,z-w,x-l,y-h,z-w,x+l,y+h,z-w,x+l,y-h,z-w,
+                x-l,y+h,z-w,x-l,y+h,z+w,x+l,y+h,z+w,x-l,y+h,z-w,x+l,y+h,z+w,x+l,y+h,z-w,
+                x+l,y-h,z-w,x+l,y+h,z-w,x+l,y+h,z+w,x+l,y-h,z-w,x+l,y+h,z+w,x+l,y-h,z+w,
+                x-l,y-h,z-w,x-l,y-h,z+w,x-l,y+h,z+w,x-l,y-h,z-w,x-l,y+h,z+w,x-l,y+h,z-w
+            ], nCubes * 5 * 18);
+
+            // normals
+
+            normals.set([
+                0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,
+                0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,
+                0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,
+                1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,
+                -1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0
+            ], nCubes * 5 * 18);
+
+            nCubes++;
+
+        }
+
+        // create pointer
+
+        var pointer = {
+            x: 0,
+            y: 0,
+            xb: 0,
+            yb: 0,
+            isDown: false,
+            add: function(elem, events, fn) {
+                for (var i = 0, e = events.split(','); i < e.length; i++) {
+                    elem.addEventListener(e[i], fn.bind(pointer), false);
+                }
+            },
+            pointer: function(e) {
+                var touchMode = e.targetTouches, pointer;
+                if (touchMode) {
+                    e.preventDefault();
+                    pointer = touchMode[0];
+                } else pointer = e;
+                this.x = pointer.clientX;
+                this.y = pointer.clientY;
+            }
+        };
+
+        // pointer events
+
+        pointer.add(window, 'mousemove,touchmove', function(e) {this.pointer(e);});
+        pointer.add(webgl.canvas, 'mousedown,touchstart', function(e) {
+            this.pointer(e);
+            this.xb = this.x;
+            this.yb = this.y;
+            this.isDown = true;
+        });
+        pointer.add(window, 'mouseup,touchend,touchcancel', function(e) {this.isDown = false;});
+
+        // camera
+
+        var camera = webgl.camera.init(60);
+        camera.x = 0;
+        camera.y = -2;
+        camera.z = size / 3;
+        camera.ax = 0;
+        camera.ay = 0;
+
+        camera.move = function (deltaX, deltaY, deltaZ) {
+
+            this.ax -= deltaX / 10;
+            this.ay -= deltaY / 10;
+
+            this.x -= Math.sin(this.ax) * deltaZ;
+            this.z -= Math.cos(this.ax) * deltaZ;
+            this.y -= Math.sin(this.ay) * deltaZ;
+
+            if (this.y > -0.5) this.y = -0.5;
+            if (this.x > size * 0.5) this.x = size * 0.5; else if (this.x < -size * 0.5) this.x = -size * 0.5;
+            if (this.z > size * 0.5) this.z = size * 0.5; else if (this.z < -size * 0.5) this.z = -size * 0.5;
+
+            this.mvMatrix.identity().rotateX(-this.ay).rotateY(-this.ax).translate([-this.x, this.y, -this.z]);
+
+            this.webgl.uniforms.uMVMatrix.set(this.mvMatrix);
+            this.normalMatrix.normalFromMat4(this.mvMatrix);
+            this.webgl.uniforms.uNMatrix.set(this.normalMatrix);
+
+        };
+
+        // create world
+
+        createCube(0, -0.1, 0, size * 20, 0.1, size * 20);
+
+        for (var x = 0; x < size; x++) {
+            for (var y = 0; y < size; y++) {
+                var xf = x - size * 0.5,
+                    yf = y - size * 0.5,
+                    d = Math.sqrt(xf * xf + yf * yf),
+                    h = 0.25 + 30 * Math.random() / d,
+                    w = 0.7;
+                if (d < size * 0.5) createCube(xf, h * 0.5, yf, w, h, w);
+            }
+        }
+
+        webgl.attributes.aVertexPosition.load(vertices, 3);
+        webgl.attributes.aVertexNormal.load(normals, 3);
+
+        // set lightning
+
+        webgl.uniforms.uAmbientColor.set(0,0,0);
+        webgl.uniforms.uPointLightingLocation.set(0, -1, -10);
+        webgl.uniforms.uPointLightingSpecularColor.set(1,0.55,0.15);
+        webgl.uniforms.uPointLightingDiffuseColor.set(0,0.25,0.5);
+
+        run();
+
+    } ();
+</script>
+
+</body>
+</html>
+
