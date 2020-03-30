@@ -1,5 +1,10 @@
 package com.lance.mail.service;
 
+/**
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
+ */
 public interface MailService {
-    public void sendSimpleMail(String to, String subject, String content);
+    void sendSimpleMail(String to, String subject, String content);
 }

@@ -9,6 +9,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
+ */
 @Service
 public class MailServiceImpl implements MailService {
 
@@ -28,7 +33,6 @@ public class MailServiceImpl implements MailService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(content);
-
         try {
             mailSender.send(message);
             logger.info("简单邮件发送成功。");

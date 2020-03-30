@@ -11,7 +11,7 @@
     <groupId>com.lance</groupId>
     <artifactId>spring-boot-redission</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>pring-boot-redission</name>
+    <name>spring-boot-redission</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

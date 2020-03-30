@@ -20,10 +20,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * (TFile)表服务实现类
- *
- * @author makejava
- * @since 2020-03-19 13:20:48
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 @Service("tFileService")
 public class TFileServiceImpl implements TFileService {

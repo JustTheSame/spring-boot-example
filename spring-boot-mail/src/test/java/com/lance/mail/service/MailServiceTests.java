@@ -15,7 +15,7 @@ public class MailServiceTests {
 
     @Test
     public void testSimpleMail() throws Exception {
-        mailService.sendSimpleMail("zhaotianicy@163.com", "mailbox", "sorry, you can't register the website.");
+        mailService.sendSimpleMail("", "mailbox", "sorry, you can't register the website.");
     }
 
 }

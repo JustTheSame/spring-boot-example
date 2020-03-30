@@ -13,20 +13,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
 /**
- * @ProjectName: qrcode
- * @Package: com.example.qrcode.controller
- * @ClassName: QRCodeController
- * @Author: z003nj4s
- * @Description: ${description}
- * @Date: 12/12/2018 9:25 AM
- * @Version: 1.0
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 @Controller
 @RequestMapping("/qrcode")
 public class QRCodeController {
 
     @Autowired
-    QRCodeService qrCodeService;
+    private QRCodeService qrCodeService;
 
     @RequestMapping(value = "/getQRCode")
     public ModelAndView getQRCode() throws IOException {
@@ -40,7 +36,6 @@ public class QRCodeController {
 
     @RequestMapping("download")
     public void downloadFileAction(HttpServletRequest request, HttpServletResponse response) {
-
         response.setCharacterEncoding(request.getCharacterEncoding());
         response.setContentType("application/octet-stream");
         FileInputStream fis = null;
@@ -54,8 +49,6 @@ public class QRCodeController {
             } catch (WriterException e) {
                 e.printStackTrace();
             }
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -70,6 +63,5 @@ public class QRCodeController {
             }
         }
     }
-
 
 }

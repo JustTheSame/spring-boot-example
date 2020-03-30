@@ -22,13 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @ProjectName: qrcode
- * @Package: com.example.qrcode.utils
- * @ClassName: QRCodeUtils
- * @Author: z003nj4s
- * @Description: ${description}
- * @Date: 12/12/2018 3:37 PM
- * @Version: 1.0
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 public class QRCodeUtils {
     /**
@@ -393,7 +389,7 @@ public class QRCodeUtils {
      * @return 生成的输出流
      */
     public static ByteArrayOutputStream createWithLogo(String text, String logoPath, int qrCodeWidth, int qrCodeHeight, int logoWidth,
-                                              int logoHeight, String format) throws IOException, WriterException {
+                                                       int logoHeight, String format) throws IOException, WriterException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         createWidthLogo(text, new FileInputStream(logoPath), qrCodeWidth, qrCodeHeight,
                 logoWidth, logoHeight, format, ENCODE_HINTS)

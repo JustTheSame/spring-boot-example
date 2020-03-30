@@ -1,7 +1,9 @@
+spring:
+  application:
+    name: spring-boot-wechat
 wechat:
   mpAppId:
   mpAppSecret:
-
 wx:
   mp:
     configs:

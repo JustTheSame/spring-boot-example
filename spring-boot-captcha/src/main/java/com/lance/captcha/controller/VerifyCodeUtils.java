@@ -11,6 +11,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
+ */
 public class VerifyCodeUtils {
 
     //使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写，去掉了1,0,i,o几个容易混淆的字符
@@ -239,9 +244,7 @@ public class VerifyCodeUtils {
     }
 
     private static void shearY(Graphics g, int w1, int h1, Color color) {
-
         int period = random.nextInt(40) + 10; // 50;
-
         boolean borderGap = true;
         int frames = 20;
         int phase = 7;
@@ -256,10 +259,7 @@ public class VerifyCodeUtils {
                 g.drawLine(i, (int) d, i, 0);
                 g.drawLine(i, (int) d + h1, i, h1);
             }
-
         }
-
     }
-
 }
 

@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author zhaotian
  */
 @Configuration
-public class MyWebMvcConfiguerAdapter implements WebMvcConfigurer {
+public class MyWebMvcConfigureAdapter implements WebMvcConfigurer {
 
     @Value("${file.rootPath}")
     private String ROOT_PATH;

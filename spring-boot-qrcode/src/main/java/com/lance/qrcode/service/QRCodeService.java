@@ -20,13 +20,9 @@ import java.io.*;
 import java.util.HashMap;
 
 /**
- * @ProjectName: qrcode
- * @Package: com.example.qrcode.service
- * @ClassName: QRCodeService
- * @Author: z003nj4s
- * @Description: ${description}
- * @Date: 12/12/2018 9:26 AM
- * @Version: 1.0
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 @Service
 public class QRCodeService {

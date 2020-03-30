@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: spring-boot-security
   security:
     user:
       name: admin

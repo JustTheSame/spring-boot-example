@@ -1,2 +1,2 @@
 # spring-boot-example
-SpringBoot Demo
+Spring Boot Demo

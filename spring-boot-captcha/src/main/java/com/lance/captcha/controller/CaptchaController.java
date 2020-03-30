@@ -12,6 +12,12 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+/**
+ * @Description:
+ *
+ * @author: zhaotian
+ * @date: 2020/3/30
+ */
 @Controller
 public class CaptchaController {
 
@@ -85,6 +91,4 @@ public class CaptchaController {
 //            return WrapMapper.ok();
         }
     }
-
-
 }

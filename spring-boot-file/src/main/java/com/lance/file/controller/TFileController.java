@@ -8,10 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 
 /**
- * (TFile)表控制层
+ * @Description:
  *
- * @author makejava
- * @since 2020-03-19 13:20:49
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 @RestController
 @RequestMapping("tFile")

@@ -6,10 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 /**
- * (TFile)表服务接口
- *
- * @author makejava
- * @since 2020-03-19 13:20:47
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 public interface TFileService {
 
@@ -25,7 +24,7 @@ public interface TFileService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<TFile> queryAllByLimit(int offset, int limit);

@@ -4,20 +4,19 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (TFile)实体类
- *
- * @author makejava
- * @since 2020-03-19 13:20:43
+ * @Description:
+ * @author: zhaotian
+ * @date: 2020/3/30
  */
 public class TFile implements Serializable {
     private static final long serialVersionUID = -11905705226587136L;
-    
+
     private Integer id;
-    
+
     private String profilePhoto;
-    
+
     private Date createTime;
-    
+
     private Date updateTime;
 
 

@@ -28,7 +28,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="TFileMap">
         select
-          id, profile_photo, create_time, update_time
+        id, profile_photo, create_time, update_time
         from demo.t_file
         <where>
             <if test="id != null">
